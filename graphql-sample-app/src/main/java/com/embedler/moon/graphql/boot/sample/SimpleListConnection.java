@@ -43,23 +43,19 @@ public class SimpleListConnection {
         return edges;
     }
 
-    public <T extends ConnectionObjectType> T get(DataFetchingEnvironment environment) {
+    public <T extends ConnectionObjectType> T get(String before, String after, Integer first, Integer last) {
 
         List<EdgeObjectType> edges = buildEdges();
 
-        int afterOffset = getOffsetFromCursor(environment.<String>getArgument("after"), -1);
+        int afterOffset = getOffsetFromCursor(after, -1);
         int begin = Math.max(afterOffset, -1) + 1;
-        int beforeOffset = getOffsetFromCursor(environment.<String>getArgument("before"), edges.size());
+        int beforeOffset = getOffsetFromCursor(before, edges.size());
         int end = Math.min(beforeOffset, edges.size());
 
         edges = edges.subList(begin, end);
         if (edges.size() == 0) {
             return emptyConnection();
         }
-
-        Integer first = environment.<Integer>getArgument("first");
-        Integer last = environment.<Integer>getArgument("last");
-
         String firstPresliceCursor = edges.get(0).getCursor();
         String lastPresliceCursor = edges.get(edges.size() - 1).getCursor();
 

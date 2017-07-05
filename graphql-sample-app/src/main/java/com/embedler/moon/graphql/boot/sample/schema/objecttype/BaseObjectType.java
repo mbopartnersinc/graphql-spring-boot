@@ -32,14 +32,14 @@ import graphql.relay.Relay;
 public class BaseObjectType implements RelayNode {
 
     @GraphQLIgnore
-    private String id;
+    private String _id;
 
     public String getId(RelayNode relayNode) {
         BaseObjectType baseObjectType = (BaseObjectType) relayNode;
-        return new Relay().toGlobalId(relayNode.getClass().getSimpleName(), baseObjectType.id);
+        return new Relay().toGlobalId(relayNode.getClass().getSimpleName(), baseObjectType._id);
     }
 
     public void setId(String id) {
-        this.id = id;
+        this._id = id;
     }
 }

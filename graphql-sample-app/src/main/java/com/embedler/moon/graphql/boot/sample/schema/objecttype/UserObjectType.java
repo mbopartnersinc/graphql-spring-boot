@@ -51,9 +51,8 @@ public class UserObjectType extends BaseObjectType {
     public TodoObjectType.TodoConnectionObjectType todos(@GraphQLIn("before") String before,
                                                          @GraphQLIn("after") String after,
                                                          @GraphQLIn(value = "first", defaultSpel = "1") Integer first,
-                                                         @GraphQLIn(value = "last", defaultProvider = "1") Integer last,
-                                                         DataFetchingEnvironment environment) {
-        return todoSchema.getSimpleConnectionTodo().get(environment);
+                                                         @GraphQLIn(value = "last", defaultProvider = "1") Integer last) {
+        return todoSchema.getSimpleConnectionTodo().get(before, after, first, last);
     }
 
 }

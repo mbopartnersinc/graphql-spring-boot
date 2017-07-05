@@ -20,6 +20,12 @@
 package com.embedler.moon.graphql.boot.sample.schema.objecttype;
 
 import com.embedler.moon.graphql.boot.sample.schema.TodoSchema;
+import com.mbopartners.boss.profile.service.ProfileService;
+import com.mbopartners.boss.project.service.ProjectService;
+import com.mbopartners.boss.security.util.AuthenticationUtils;
+import com.mbopartners.boss.security.util.BossAuthenticationToken;
+import com.mbopartners.profile.model.Profile;
+import com.mbopartners.project.model.Project;
 import com.oembedler.moon.graphql.engine.relay.RelayNode;
 import com.oembedler.moon.graphql.engine.stereotype.GraphQLDescription;
 import com.oembedler.moon.graphql.engine.stereotype.GraphQLField;
@@ -28,13 +34,28 @@ import com.oembedler.moon.graphql.engine.stereotype.GraphQLIgnore;
 import com.oembedler.moon.graphql.engine.stereotype.GraphQLIn;
 import com.oembedler.moon.graphql.engine.stereotype.GraphQLNonNull;
 import com.oembedler.moon.graphql.engine.stereotype.GraphQLObject;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingEnvironmentImpl;
+import graphql.servlet.GraphQLContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:java.lang.RuntimeException@gmail.com">oEmbedler Inc.</a>
  */
 @GraphQLObject("Root")
 public class RootObjectType {
+
+    @Autowired
+    @GraphQLIgnore
+    private ProjectService projectService;
+
+    @Autowired
+    @GraphQLIgnore
+    private ProfileService profileService;
 
     @GraphQLNonNull
     @GraphQLField("version")
@@ -46,9 +67,34 @@ public class RootObjectType {
     private TodoSchema todoSchema;
 
     @GraphQLField
-    public UserObjectType viewer() {
-        return todoSchema.getTheOnlyUser();
+    public ProfileObjectType viewer() {
+        BossAuthenticationToken token = AuthenticationUtils.getAuthToken();
+        token.getToken().getEmployeeNumber();
+        Profile profile = profileService.retrieveByMboId(token.getToken().getEmployeeNumber());
+        ProfileObjectType profileObjectType = new ProfileObjectType();
+        profileObjectType.setMboId(profile.getMboId());
+        profileObjectType.setFirstName(profile.getFirstName());
+        profileObjectType.setLastName(profile.getLastName());
+        return profileObjectType;
     }
+
+    @GraphQLField
+    @GraphQLNonNull
+    public List<ProjectObjectType> projects() {
+
+        List<Project> projects = projectService.getProjectByMboId("a5123be5-8607-49c3-a248-f4bc6f0c9a3f");
+        List<ProjectObjectType> projectObjectTypes = new ArrayList<>();
+        projects.forEach(project -> {
+            ProjectObjectType objectType = new ProjectObjectType();
+            objectType.setId(project.getId());
+            objectType.setMboId(project.getMboId());
+            objectType.setName(project.getName());
+            projectObjectTypes.add(objectType);
+        });
+        return projectObjectTypes;
+    }
+
+
 
     @GraphQLField
     public RelayNode node(@GraphQLID @GraphQLNonNull @GraphQLIn("id") final String id) {

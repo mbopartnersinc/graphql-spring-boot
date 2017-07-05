@@ -33,16 +33,30 @@ apply plugin: 'org.springframework.boot'
 
 repositories {
     jcenter()
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "http://nexus-aws.mbopartners.com/content/groups/public/"
+    }
 }
 
-dependencies{
+dependencies {
     compile(project(":graphql-spring-boot-starter"))
-    compile(project(":graphiql-spring-boot-starter"))
+//    compile(project(":graphiql-spring-boot-starter"))
+//    compile group: 'com.graphql-java', name: 'graphql-java-annotations', version: '3.0.3'
+//    compile "com.graphql-java:graphql-java-annotations:3.0.3"
 
     compile "com.embedler.moon.graphql:spring-graphql-common:$LIB_SPRING_GRAPHQL_COMMON_VER"
 
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
+
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.16'
+    compile group: 'com.mbopartners.boss.project', name: 'project-adapter', version: '1.0.4-1'
+    compile group: 'com.mbopartners.boss.profile', name: 'profile-adapter', version: '1.0.8-6'
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.8.7'
+
+
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
